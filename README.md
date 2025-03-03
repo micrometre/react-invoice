@@ -26,7 +26,6 @@ This project is a React application that allows users to dynamically create and 
 *   **jsPDF:** A library for generating PDF documents in JavaScript.
 *   **jsPDF-AutoTable:** An extension for jsPDF to create table layouts in the PDF.
 *   **date-fns:** A utility library for date formatting.
-* **React Hooks** (`useState`): Used for state management.
 
 ## Installation and Usage
 
