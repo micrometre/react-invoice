@@ -1,6 +1,6 @@
-# React RFQ (Request for Quotation) PDF Generator
+# React Invoice PDF Generator
 
-This project is a React application that allows users to dynamically create and generate Request for Quotation (RFQ) PDF documents. Users can input vendor details and item information, and then generate a PDF that reflects this data.
+This project is a React application that allows users to dynamically create and generate invoices. Users can input vendor details and item information, and then generate a PDF that reflects this data.
 
 ## Features
 
@@ -35,7 +35,7 @@ This project is a React application that allows users to dynamically create and 
     git clone <repository-url>
     cd <repository-directory>
     ```
-    Replace `<repository-url>` and `<repository-directory>` with your actual repository URL and folder name.
+    Replace `https://github.com/micrometre/react-invoice` and `react-invoice` with your actual repository URL and folder name.
 2.  **Install Dependencies:**
     ```bash
     npm install  # or yarn install
