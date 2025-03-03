@@ -32,10 +32,9 @@ This project is a React application that allows users to dynamically create and 
 
 1.  **Clone the Repository:**
     ```bash
-    git clone <repository-url>
-    cd <repository-directory>
+    git clone https://github.com/micrometre/react-invoice
+    cd react-invoice
     ```
-    Replace `https://github.com/micrometre/react-invoice` and `react-invoice` with your actual repository URL and folder name.
 2.  **Install Dependencies:**
     ```bash
     npm install  # or yarn install
