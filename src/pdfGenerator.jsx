@@ -6,16 +6,16 @@ applyPlugin(jsPDF);
 
 const PdfGenerator = () => {
   const [vendorData, setVendorData] = useState({
-    vendorName: 'Velavan B',
-    vendorAddress: '14/203, Kallakulam, Seenapuram',
-    vendorPinCode: '638057',
-    contactPerson: 'Santhosh D',
-    contactPersonMobNo: '8993298712',
+    vendorName: 'Foo',
+    vendorAddress: '123 Kings Road',
+    vendorPinCode: 'SW1A 1AA',
+    contactPerson: 'Bar',
+    contactPersonMobNo: '07444 899 712',
   });
 
   const [itemsData, setItemsData] = useState([
-    { itemName: 'Water Tanks', quantity: "15", uom: "Liters", unitPrice: "1200", total: (15 * 1200).toString() },
-    { itemName: 'Bookshelves', quantity: "2", uom: "Units", unitPrice: "5000", total: (2 * 5000).toString() },
+    { itemName: 'Water Tanks', quantity: "15",  unitPrice: "1200", total: (15 * 1200).toString() },
+    { itemName: 'Bookshelves', quantity: "2",  unitPrice: "5000", total: (2 * 5000).toString() },
   ]);
 
   const grandTotal = useMemo(() => {
@@ -23,7 +23,7 @@ const PdfGenerator = () => {
   }, [itemsData]);
 
   const handleAddItem = () => {
-    setItemsData([...itemsData, { itemName: '', quantity: '', uom: '', unitPrice: '', total: '' }]);
+    setItemsData([...itemsData, { itemName: '', quantity: '',  unitPrice: '', total: '' }]);
   };
 
   const handleItemChange = (index, field, value) => {
@@ -57,16 +57,16 @@ const PdfGenerator = () => {
     const imageUrl = "../public/logo.jpg";
     pdf.addImage(imageUrl, 'JPEG', 10, 5, 40, 12);
     pdf.setFontSize(10);
-    pdf.text('REQUEST FOR QUOTATION', 150, 12);
+    pdf.text(`INVOICE`,  150, 12);
     pdf.setLineWidth(0.1);
     pdf.setDrawColor(200, 200, 200);
     pdf.line(10, 18, 200, 18);
-    pdf.text('Contact Person', 13, 23);
-    pdf.text("Nithish Kumar CP", 13, 28);
+    pdf.text('FastScrew LTD', 13, 23);
+    pdf.text("Basil", 13, 28);
     pdf.addImage(callImage, 'PNG', 13, 29, 3, 3);
-    pdf.text("9078382732", 16, 32);
-    pdf.text('RFQ No      :', 130, 23);
-    pdf.text('RFQ Date   :', 130, 27);
+    pdf.text("074447 907 838", 16, 32);
+    pdf.text('invoice No      :', 130, 23);
+    pdf.text('invoice Date   :', 130, 27);
     pdf.text('Due Date    :', 130, 31);
     pdf.text("RFQ20240092", 155, 23);
     pdf.text(format(new Date(), 'MMM dd, yyyy'), 155, 27);
@@ -88,15 +88,13 @@ const PdfGenerator = () => {
       (index + 1).toString(),
       item.itemName.toString(),
       item.quantity?.toString(),
-      item.uom?.toString(),
       item.total?.toLocaleString(),
     ]);
-    const itemDetailsHeaders = ['S.No', 'Item Name', 'Quantity', 'UOM', 'Total'];
+    const itemDetailsHeaders = ['S.No', 'Item Name', 'Quantity', 'Total'];
     const columnWidths = [15, 90, 30, 30, 23];
     const headerStyles = {
       fillColor: [240, 240, 240],
       textColor: [0],
-      fontFamily: 'Newsreader',
       fontStyle: 'bold',
     };
 
@@ -122,7 +120,6 @@ const PdfGenerator = () => {
       alternateRowStyles: { fillColor: [255, 255, 255] },
       bodyStyles: {
         fontSize: 10,
-        font: 'Newsreader',
         cellPadding: { top: 1, right: 5, bottom: 1, left: 2 },
         textColor: [0, 0, 0],
         rowPageBreak: 'avoid',
@@ -131,7 +128,7 @@ const PdfGenerator = () => {
       didDrawPage: function (data) {
         pdf.setFontSize(12);
         pdf.setFont('helvetica', 'bold');
-        pdf.text(`Grand Total: ${grandTotal.toLocaleString()}`, 13, data.cursor.y + 10);
+        pdf.text(`Grand Total: £${grandTotal.toLocaleString()}`, 13, data.cursor.y + 10);
       },
     });
 
@@ -256,8 +253,8 @@ const PdfGenerator = () => {
           </tbody>
           <tfoot>
             <tr>
-              <td colSpan="5" className="text-right px-4 py-2 border font-bold">Grand Total:</td>
-              <td colSpan="2" className="px-4 py-2 border font-bold">{grandTotal.toLocaleString()}</td>
+              <td colSpan="3" className="text-right px-4 py-2 border font-bold">Grand Total:</td>
+              <td colSpan="2" className="px-4 py-2 border font-bold">£{grandTotal.toLocaleString()}</td>
             </tr>
           </tfoot>
         </table>
