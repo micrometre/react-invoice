@@ -19,7 +19,7 @@ const PdfGenerator = () => {
   ]);
 
   const grandTotal = useMemo(() => {
-    return itemsData.reduce((sum, item) => sum + (parseInt(item.total) || 0), 0);
+    return itemsData.reduce((sum, item) => sum + (parseInt(item.total) || 0), 0).toFixed(2);
   }, [itemsData]);
 
   const handleAddItem = () => {
@@ -32,8 +32,9 @@ const PdfGenerator = () => {
 
     if (field === 'quantity' || field === 'unitPrice') {
       const quantity = parseInt(newItemsData[index].quantity) || 0;
-      const unitPrice = parseInt(newItemsData[index].unitPrice) || 0;
-      newItemsData[index].total = (quantity * unitPrice).toString();
+      const unitPrice = parseFloat(newItemsData[index].unitPrice) || 0;
+
+      newItemsData[index].total = (quantity * unitPrice).toFixed(2).toString();
     }
 
     setItemsData(newItemsData);
@@ -73,9 +74,6 @@ const PdfGenerator = () => {
     pdf.text(format(new Date("2024-02-08 00:00:00.000 +0530"), 'MMM dd, yyyy'), 155, 31);
     pdf.line(10, 34, 200, 34);
     pdf.text('To', 13, 39);
-    pdf.text('Purchase Centre Address :', 130, 39);
-    pdf.text('Head Office', 130, 44);
-    pdf.text('CHENNAI', 130, 48);
     pdf.text(`${vendorData?.vendorName}`, 13, 44);
     pdf.text(`${vendorData?.vendorAddress}`, 13, 48);
     pdf.text(`P.O BOX : ${vendorData?.vendorPinCode}`, 13, 52);
@@ -169,7 +167,7 @@ const PdfGenerator = () => {
           />
         </div>
         <div>
-          <label htmlFor="vendorPinCode" className="block text-sm font-medium text-gray-700">Vendor Pin Code:</label>
+          <label htmlFor="vendorPinCode" className="block text-sm font-medium text-gray-700">Vendor Post Code:</label>
           <input
             type="text"
             id="vendorPinCode"
@@ -239,7 +237,7 @@ const PdfGenerator = () => {
                     className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </td>
-                <td className="px-4 py-2 border">{item.total}</td>
+                <td className="px-4 py-2 border">£{item.total}</td>
                 <td className="px-4 py-2 border">
                   <button
                     onClick={() => handleRemoveItem(index)}
