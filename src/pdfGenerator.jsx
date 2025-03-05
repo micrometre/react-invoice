@@ -5,6 +5,11 @@ import { applyPlugin } from 'jspdf-autotable';
 applyPlugin(jsPDF);
 
 const PdfGenerator = () => {
+  const [invoiceDetails, setInvoiceDetails] = useState({
+    invoiceNo: 'RFQ20240092',
+    invoiceDate: new Date().toISOString().split('T')[0], // Default to today's date
+    dueDate: '2024-02-08', // Default due date
+  });
   const [vendorData, setVendorData] = useState({
     vendorName: 'Foo',
     vendorAddress: '123 Kings Road',
@@ -14,8 +19,8 @@ const PdfGenerator = () => {
   });
 
   const [itemsData, setItemsData] = useState([
-    { itemName: 'Water Tanks', quantity: "15",  unitPrice: "1200", total: (15 * 1200).toString() },
-    { itemName: 'Bookshelves', quantity: "2",  unitPrice: "5000", total: (2 * 5000).toString() },
+    { itemName: 'Water Tanks', quantity: "15", unitPrice: "1200", total: (15 * 1200).toString() },
+    { itemName: 'Bookshelves', quantity: "2", unitPrice: "5000", total: (2 * 5000).toString() },
   ]);
 
   const grandTotal = useMemo(() => {
@@ -23,7 +28,7 @@ const PdfGenerator = () => {
   }, [itemsData]);
 
   const handleAddItem = () => {
-    setItemsData([...itemsData, { itemName: '', quantity: '',  unitPrice: '', total: '' }]);
+    setItemsData([...itemsData, { itemName: '', quantity: '', unitPrice: '', total: '' }]);
   };
 
   const handleItemChange = (index, field, value) => {
@@ -58,7 +63,7 @@ const PdfGenerator = () => {
     const imageUrl = "../public/logo.jpg";
     pdf.addImage(imageUrl, 'JPEG', 10, 5, 40, 12);
     pdf.setFontSize(10);
-    pdf.text(`INVOICE`,  150, 12);
+    pdf.text(`INVOICE`, 150, 12);
     pdf.setLineWidth(0.1);
     pdf.setDrawColor(200, 200, 200);
     pdf.line(10, 18, 200, 18);
@@ -144,6 +149,38 @@ const PdfGenerator = () => {
 
   return (
     <div className="p-4 bg-gray-100 min-h-screen">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div>
+          <label htmlFor="invoiceNo" className="block text-sm font-medium text-gray-700">Invoice No:</label>
+          <input
+            type="text"
+            id="invoiceNo"
+            value={invoiceDetails.invoiceNo}
+            onChange={(e) => setInvoiceDetails({ ...invoiceDetails, invoiceNo: e.target.value })}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          />
+        </div>
+        <div>
+          <label htmlFor="invoiceDate" className="block text-sm font-medium text-gray-700">Invoice Date:</label>
+          <input
+            type="date"
+            id="invoiceDate"
+            value={invoiceDetails.invoiceDate}
+            onChange={(e) => setInvoiceDetails({ ...invoiceDetails, invoiceDate: e.target.value })}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          />
+        </div>
+        <div>
+          <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700">Due Date:</label>
+          <input
+            type="date"
+            id="dueDate"
+            value={invoiceDetails.dueDate}
+            onChange={(e) => setInvoiceDetails({ ...invoiceDetails, dueDate: e.target.value })}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          />
+        </div>
+      </div>  
       <h2 className="text-2xl font-bold mb-4">Vendor Details</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div>
