@@ -74,7 +74,7 @@ const PdfGenerator = () => {
     pdf.text('invoice No      :', 130, 23);
     pdf.text('invoice Date   :', 130, 27);
     pdf.text('Due Date    :', 130, 31);
-    pdf.text("RFQ20240092", 155, 23);
+    pdf.text("RFQ001", 155, 23);
     pdf.text(format(new Date(), 'MMM dd, yyyy'), 155, 27);
     pdf.text(format(new Date("2024-02-08 00:00:00.000 +0530"), 'MMM dd, yyyy'), 155, 31);
     pdf.line(10, 34, 200, 34);
