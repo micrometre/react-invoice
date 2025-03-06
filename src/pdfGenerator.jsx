@@ -17,7 +17,13 @@ const PdfGenerator = () => {
     contactPerson: 'Bar',
     contactPersonMobNo: '07444 899 712',
   });
-
+  const [customerData, setCustomerData] = useState({
+    customerName: 'John Doe',
+    customerAddress: '456 Customer Street',
+    customerPinCode: '12345',
+    customerContactPerson: 'Jane Doe',
+    customerContactPersonMobNo: '09876 543 210',
+  });
   const [itemsData, setItemsData] = useState([
     { itemName: 'Water Tanks', quantity: "15", unitPrice: "1200", total: (15 * 1200).toString() },
     { itemName: 'Bookshelves', quantity: "2", unitPrice: "5000", total: (2 * 5000).toString() },
@@ -57,7 +63,7 @@ const PdfGenerator = () => {
 
   const generatePdf = () => {
     const pdf = new jsPDF();
-    pdf.setProperties({ title: "Request For Quotation" });
+    pdf.setProperties({ title: "INVOICE" });
 
     const callImage = "../public/logo.jpg";
     const imageUrl = "../public/logo.jpg";
@@ -67,10 +73,6 @@ const PdfGenerator = () => {
     pdf.setLineWidth(0.1);
     pdf.setDrawColor(200, 200, 200);
     pdf.line(10, 18, 200, 18);
-    pdf.text('FastScrew LTD', 13, 23);
-    pdf.text("Basil", 13, 28);
-    pdf.addImage(callImage, 'PNG', 13, 29, 3, 3);
-    pdf.text("074447 907 838", 16, 32);
     pdf.text('invoice No      :', 130, 23);
     pdf.text('invoice Date   :', 130, 27);
     pdf.text('Due Date    :', 130, 31);
@@ -78,7 +80,6 @@ const PdfGenerator = () => {
     pdf.text(format(new Date(), 'MMM dd, yyyy'), 155, 27);
     pdf.text(format(new Date("2024-02-08 00:00:00.000 +0530"), 'MMM dd, yyyy'), 155, 31);
     pdf.line(10, 34, 200, 34);
-    pdf.text('To', 13, 39);
     pdf.text(`${vendorData?.vendorName}`, 13, 44);
     pdf.text(`${vendorData?.vendorAddress}`, 13, 48);
     pdf.text(`P.O BOX : ${vendorData?.vendorPinCode}`, 13, 52);
@@ -86,6 +87,16 @@ const PdfGenerator = () => {
     pdf.text(`${vendorData?.contactPerson}`, 13, 60);
     pdf.addImage(callImage, 'PNG', 13, 61, 3, 3);
     pdf.text(`  ${vendorData?.contactPersonMobNo || "N/A"}`, 16, 64);
+
+    pdf.text('Customer', 13, 69);
+    pdf.text(`${customerData?.customerName}`, 13, 74);
+    pdf.text(`${customerData?.customerAddress}`, 13, 78);
+    pdf.text(`P.O BOX : ${customerData?.customerPinCode}`, 13, 82);
+    pdf.text('Contact Person', 13, 86);
+    pdf.text(`${customerData?.customerContactPerson}`, 13, 90);
+    pdf.addImage(callImage, 'PNG', 13, 91, 3, 3);
+    pdf.text(`  ${customerData?.customerContactPersonMobNo || "N/A"}`, 16, 94);
+
 
     const itemDetailsRows = itemsData?.map((item, index) => [
       (index + 1).toString(),
@@ -180,7 +191,7 @@ const PdfGenerator = () => {
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
         </div>
-      </div>  
+      </div>
       <h2 className="text-2xl font-bold mb-4">Vendor Details</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div>
@@ -234,6 +245,61 @@ const PdfGenerator = () => {
           />
         </div>
       </div>
+
+      <h2 className="text-2xl font-bold mb-4">Customer Details</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div>
+          <label htmlFor="customerName" className="block text-sm font-medium text-gray-700">Customer Name:</label>
+          <input
+            type="text"
+            id="customerName"
+            value={customerData.customerName}
+            onChange={(e) => setCustomerData({ ...customerData, customerName: e.target.value })}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          />
+        </div>
+        <div>
+          <label htmlFor="customerAddress" className="block text-sm font-medium text-gray-700">Customer Address:</label>
+          <input
+            type="text"
+            id="customerAddress"
+            value={customerData.customerAddress}
+            onChange={(e) => setCustomerData({ ...customerData, customerAddress: e.target.value })}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          />
+        </div>
+        <div>
+          <label htmlFor="customerPinCode" className="block text-sm font-medium text-gray-700">Customer Post Code:</label>
+          <input
+            type="text"
+            id="customerPinCode"
+            value={customerData.customerPinCode}
+            onChange={(e) => setCustomerData({ ...customerData, customerPinCode: e.target.value })}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          />
+        </div>
+        <div>
+          <label htmlFor="customerContactPerson" className="block text-sm font-medium text-gray-700">Contact Person:</label>
+          <input
+            type="text"
+            id="customerContactPerson"
+            value={customerData.customerContactPerson}
+            onChange={(e) => setCustomerData({ ...customerData, customerContactPerson: e.target.value })}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          />
+        </div>
+        <div>
+          <label htmlFor="customerContactPersonMobNo" className="block text-sm font-medium text-gray-700">Contact Person Mobile No:</label>
+          <input
+            type="text"
+            id="customerContactPersonMobNo"
+            value={customerData.customerContactPersonMobNo}
+            onChange={(e) => setCustomerData({ ...customerData, customerContactPersonMobNo: e.target.value })}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          />
+        </div>
+      </div>
+
 
       <h2 className="text-2xl font-bold mb-4">Item Details</h2>
       <div className="overflow-x-auto">
