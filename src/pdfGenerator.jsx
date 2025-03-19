@@ -8,7 +8,7 @@ const PdfGenerator = () => {
   const [invoiceDetails, setInvoiceDetails] = useState({
     invoiceNo: 'RFQ20240092',
     invoiceDate: new Date().toISOString().split('T')[0], // Default to today's date
-    dueDate: '2024-02-08', // Default due date
+    dueDate: new Date().toISOString().split('T')[0], // Default to today's date
   });
   const [vendorData, setVendorData] = useState({
     vendorName: 'Foo',
@@ -78,7 +78,7 @@ const PdfGenerator = () => {
     pdf.text('Due Date    :', 130, 31);
     pdf.text("RFQ001", 155, 23);
     pdf.text(format(new Date(), 'MMM dd, yyyy'), 155, 27);
-    pdf.text(format(new Date("2024-02-08 00:00:00.000 +0530"), 'MMM dd, yyyy'), 155, 31);
+    pdf.text(format(new Date(), 'MMM dd, yyyy'), 155, 31);
     pdf.line(10, 34, 200, 34);
     pdf.text(`${vendorData?.vendorName}`, 13, 44);
     pdf.text(`${vendorData?.vendorAddress}`, 13, 48);
