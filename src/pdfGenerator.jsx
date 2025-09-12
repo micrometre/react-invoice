@@ -65,92 +65,248 @@ const PdfGenerator = () => {
     const pdf = new jsPDF();
     pdf.setProperties({ title: "INVOICE" });
 
-    const callImage = "../public/logo.jpg";
-    const imageUrl = "../public/logo.jpg";
-    pdf.addImage(imageUrl, 'JPEG', 10, 5, 40, 12);
+    // Define colors
+    const primaryColor = [52, 73, 94];   // Dark blue-gray
+    const secondaryColor = [149, 165, 166]; // Light gray
+    const accentColor = [52, 152, 219];  // Blue
+    
+    // Header Section with improved layout
+    try {
+      const imageUrl = "/logo.jpg";
+      pdf.addImage(imageUrl, 'JPEG', 15, 15, 35, 20);
+    } catch (error) {
+      // If logo fails to load, add placeholder
+      pdf.setFontSize(16);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(...primaryColor);
+      pdf.text('YOUR COMPANY', 15, 25);
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text('LOGO', 15, 30);
+    }
+    
+    // Company details on the right
+    pdf.setFontSize(24);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(...primaryColor);
+    pdf.text('INVOICE', 140, 25);
+    
+    // Add decorative line under header
+    pdf.setLineWidth(2);
+    pdf.setDrawColor(...accentColor);
+    pdf.line(15, 40, 195, 40);
+    
+    pdf.setLineWidth(0.5);
+    pdf.setDrawColor(...secondaryColor);
+    pdf.line(15, 42, 195, 42);
+    
+    // Invoice metadata section with improved layout
+    const metadataStartY = 50;
     pdf.setFontSize(10);
-    pdf.text(`INVOICE`, 150, 12);
-    pdf.setLineWidth(0.1);
-    pdf.setDrawColor(200, 200, 200);
-    pdf.line(10, 18, 200, 18);
-    pdf.text('invoice No      :', 130, 23);
-    pdf.text('invoice Date   :', 130, 27);
-    pdf.text('Due Date    :', 130, 31);
-    pdf.text("RFQ001", 155, 23);
-    pdf.text(format(new Date(), 'MMM dd, yyyy'), 155, 27);
-    pdf.text(format(new Date(), 'MMM dd, yyyy'), 155, 31);
-    pdf.line(10, 34, 200, 34);
-    pdf.text(`${vendorData?.vendorName}`, 13, 44);
-    pdf.text(`${vendorData?.vendorAddress}`, 13, 48);
-    pdf.text(`P.O BOX : ${vendorData?.vendorPinCode}`, 13, 52);
-    pdf.text('Contact Person', 13, 56);
-    pdf.text(`${vendorData?.contactPerson}`, 13, 60);
-    pdf.addImage(callImage, 'PNG', 13, 61, 3, 3);
-    pdf.text(`  ${vendorData?.contactPersonMobNo || "N/A"}`, 16, 64);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(...primaryColor);
+    
+    // Create a box for invoice details
+    pdf.setFillColor(248, 249, 250);
+    pdf.rect(140, metadataStartY, 55, 25, 'F');
+    pdf.setDrawColor(...secondaryColor);
+    pdf.rect(140, metadataStartY, 55, 25);
+    
+    pdf.text('Invoice No:', 143, metadataStartY + 6);
+    pdf.text('Invoice Date:', 143, metadataStartY + 12);
+    pdf.text('Due Date:', 143, metadataStartY + 18);
+    
+    pdf.setFont('helvetica', 'normal');
+    pdf.text(invoiceDetails.invoiceNo, 170, metadataStartY + 6);
+    pdf.text(format(new Date(invoiceDetails.invoiceDate), 'MMM dd, yyyy'), 170, metadataStartY + 12);
+    pdf.text(format(new Date(invoiceDetails.dueDate), 'MMM dd, yyyy'), 170, metadataStartY + 18);
+    
+    // Vendor and Customer sections with improved layout
+    const sectionStartY = 85;
+    
+    // Vendor Section
+    pdf.setFontSize(12);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(...accentColor);
+    pdf.text('VENDOR DETAILS', 15, sectionStartY);
+    
+    // Vendor box
+    pdf.setFillColor(252, 253, 254);
+    pdf.rect(15, sectionStartY + 5, 85, 40, 'F');
+    pdf.setDrawColor(...secondaryColor);
+    pdf.rect(15, sectionStartY + 5, 85, 40);
+    
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(...primaryColor);
+    pdf.text(vendorData?.vendorName || 'N/A', 18, sectionStartY + 12);
+    
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(9);
+    pdf.text(vendorData?.vendorAddress || 'N/A', 18, sectionStartY + 18);
+    pdf.text(`Post Code: ${vendorData?.vendorPinCode || 'N/A'}`, 18, sectionStartY + 24);
+    pdf.text(`Contact: ${vendorData?.contactPerson || 'N/A'}`, 18, sectionStartY + 30);
+    pdf.text(`Phone: ${vendorData?.contactPersonMobNo || 'N/A'}`, 18, sectionStartY + 36);
 
-    pdf.text('Customer', 13, 69);
-    pdf.text(`${customerData?.customerName}`, 13, 74);
-    pdf.text(`${customerData?.customerAddress}`, 13, 78);
-    pdf.text(`P.O BOX : ${customerData?.customerPinCode}`, 13, 82);
-    pdf.text('Contact Person', 13, 86);
-    pdf.text(`${customerData?.customerContactPerson}`, 13, 90);
-    pdf.addImage(callImage, 'PNG', 13, 91, 3, 3);
-    pdf.text(`  ${customerData?.customerContactPersonMobNo || "N/A"}`, 16, 94);
+    // Customer Section
+    pdf.setFontSize(12);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(...accentColor);
+    pdf.text('CUSTOMER DETAILS', 110, sectionStartY);
+    
+    // Customer box
+    pdf.setFillColor(252, 253, 254);
+    pdf.rect(110, sectionStartY + 5, 85, 40, 'F');
+    pdf.setDrawColor(...secondaryColor);
+    pdf.rect(110, sectionStartY + 5, 85, 40);
+    
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(...primaryColor);
+    pdf.text(customerData?.customerName || 'N/A', 113, sectionStartY + 12);
+    
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(9);
+    pdf.text(customerData?.customerAddress || 'N/A', 113, sectionStartY + 18);
+    pdf.text(`Post Code: ${customerData?.customerPinCode || 'N/A'}`, 113, sectionStartY + 24);
+    pdf.text(`Contact: ${customerData?.customerContactPerson || 'N/A'}`, 113, sectionStartY + 30);
+    pdf.text(`Phone: ${customerData?.customerContactPersonMobNo || 'N/A'}`, 113, sectionStartY + 36);
 
-
+    // Enhanced Items Table
     const itemDetailsRows = itemsData?.map((item, index) => [
       (index + 1).toString(),
       item.itemName.toString(),
-      item.quantity?.toString(),
-      item.total?.toLocaleString(),
+      item.quantity?.toString() || '0',
+      `£${parseFloat(item.unitPrice || 0).toFixed(2)}`,
+      `£${parseFloat(item.total || 0).toFixed(2)}`,
     ]);
-    const itemDetailsHeaders = ['S.No', 'Item Name', 'Quantity', 'Total'];
-    const columnWidths = [15, 90, 30, 30, 23];
-    const headerStyles = {
-      fillColor: [240, 240, 240],
-      textColor: [0],
-      fontStyle: 'bold',
-    };
+    
+    const itemDetailsHeaders = ['S.No', 'Item Description', 'Qty', 'Unit Price', 'Total Amount'];
+    
+    const itemDetailsYStart = sectionStartY + 55;
+    
+    // Add items section title
+    pdf.setFontSize(12);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(...accentColor);
+    pdf.text('ITEMS & SERVICES', 15, itemDetailsYStart - 5);
 
-    const itemDetailsYStart = 88;
     pdf.autoTable({
       head: [itemDetailsHeaders],
       body: itemDetailsRows,
       startY: itemDetailsYStart,
       headStyles: {
-        fillColor: headerStyles.fillColor,
-        textColor: headerStyles.textColor,
-        fontStyle: headerStyles.fontStyle,
+        fillColor: primaryColor,
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
         fontSize: 10,
-        halign: 'left',
+        halign: 'center',
+        valign: 'middle',
       },
       columnStyles: {
-        0: { cellWidth: columnWidths[0] },
-        1: { cellWidth: columnWidths[1] },
-        2: { cellWidth: columnWidths[2] },
-        3: { cellWidth: columnWidths[3] },
-        4: { cellWidth: columnWidths[4] },
+        0: { cellWidth: 20, halign: 'center' },
+        1: { cellWidth: 85, halign: 'left' },
+        2: { cellWidth: 25, halign: 'center' },
+        3: { cellWidth: 30, halign: 'right' },
+        4: { cellWidth: 35, halign: 'right' },
       },
-      alternateRowStyles: { fillColor: [255, 255, 255] },
+      alternateRowStyles: { 
+        fillColor: [248, 249, 250] 
+      },
       bodyStyles: {
-        fontSize: 10,
-        cellPadding: { top: 1, right: 5, bottom: 1, left: 2 },
+        fontSize: 9,
+        cellPadding: { top: 4, right: 5, bottom: 4, left: 5 },
         textColor: [0, 0, 0],
-        rowPageBreak: 'avoid',
+        lineColor: secondaryColor,
+        lineWidth: 0.1,
       },
-      margin: { top: 10, left: 13 },
+      tableLineColor: secondaryColor,
+      tableLineWidth: 0.1,
+      margin: { left: 15, right: 15 },
       didDrawPage: function (data) {
-        pdf.setFontSize(12);
+        const finalY = data.cursor.y;
+        
+        // Calculate subtotal, tax, and total
+        const subtotal = parseFloat(grandTotal);
+        const taxRate = 0.20; // 20% VAT
+        const taxAmount = subtotal * taxRate;
+        const totalWithTax = subtotal + taxAmount;
+        
+        // Summary section
+        const summaryX = 130;
+        let summaryY = finalY + 15;
+        
+        // Summary box
+        pdf.setFillColor(248, 249, 250);
+        pdf.rect(summaryX, summaryY - 5, 65, 30, 'F');
+        pdf.setDrawColor(...secondaryColor);
+        pdf.rect(summaryX, summaryY - 5, 65, 30);
+        
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(...primaryColor);
+        
+        // Subtotal
+        pdf.text('Subtotal:', summaryX + 3, summaryY + 3);
+        pdf.text(`£${subtotal.toFixed(2)}`, summaryX + 45, summaryY + 3);
+        
+        // Tax
+        pdf.text('VAT (20%):', summaryX + 3, summaryY + 9);
+        pdf.text(`£${taxAmount.toFixed(2)}`, summaryX + 45, summaryY + 9);
+        
+        // Line separator
+        pdf.setLineWidth(0.5);
+        pdf.line(summaryX + 3, summaryY + 12, summaryX + 62, summaryY + 12);
+        
+        // Total
         pdf.setFont('helvetica', 'bold');
-        pdf.text(`Grand Total: £${grandTotal.toLocaleString()}`, 13, data.cursor.y + 10);
+        pdf.setFontSize(12);
+        pdf.text('TOTAL:', summaryX + 3, summaryY + 18);
+        pdf.text(`£${totalWithTax.toFixed(2)}`, summaryX + 35, summaryY + 18);
+        
+        // Payment terms and additional info
+        const termsY = finalY + 55;
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(...accentColor);
+        pdf.text('PAYMENT TERMS & CONDITIONS', 15, termsY);
+        
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(9);
+        pdf.setTextColor(...primaryColor);
+        const terms = [
+          '• Payment is due within 30 days of invoice date',
+          '• Late payments may incur additional charges',
+          '• Please quote invoice number in all correspondence',
+          '• Bank Details: Sort Code: 12-34-56, Account: 12345678'
+        ];
+        
+        terms.forEach((term, index) => {
+          pdf.text(term, 15, termsY + 8 + (index * 5));
+        });
       },
     });
 
+    // Enhanced page numbering and footer
     const totalPages = pdf.internal.getNumberOfPages();
     for (let i = 1; i <= totalPages; i++) {
-      pdf.line(10, 283, 200, 283);
       pdf.setPage(i);
-      pdf.text(`Page ${i} of ${totalPages}`, 185, pdf.internal.pageSize.getHeight() - 5);
+      
+      // Footer line
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      pdf.setLineWidth(0.5);
+      pdf.setDrawColor(...secondaryColor);
+      pdf.line(15, pageHeight - 20, 195, pageHeight - 20);
+      
+      // Page number
+      pdf.setFontSize(8);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(...secondaryColor);
+      pdf.text(`Page ${i} of ${totalPages}`, 15, pageHeight - 10);
+      
+      // Company footer info
+      pdf.text('Thank you for your business!', 105, pageHeight - 10, { align: 'center' });
+      pdf.text(`Generated on ${format(new Date(), 'MMM dd, yyyy HH:mm')}`, 195, pageHeight - 10, { align: 'right' });
     }
     pdf.save(`invoice-${format(new Date(), 'yyyyMMddHHmmss')}.pdf`);
     const pdfDataUri = pdf.output('datauristring');
