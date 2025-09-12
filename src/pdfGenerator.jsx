@@ -21,11 +21,11 @@ const PdfGenerator = () => {
     dueDate: new Date().toISOString().split('T')[0], // Default to today's date
   });
   const [companyData, setCompanyData] = useState({
-    companyName: 'YOUR COMPANY NAME',
-    companyAddress: '123 Business Street',
-    companyCity: 'City, State 12345',
-    companyPhone: '(555) 123-4567',
-    companyEmail: 'info@yourcompany.com',
+    companyName: '',
+    companyAddress: '',
+    companyCity: '',
+    companyPhone: '',
+    companyEmail: '',
   });
   const [vendorData, setVendorData] = useState({
     vendorName: 'Foo',
@@ -35,11 +35,11 @@ const PdfGenerator = () => {
     contactPersonMobNo: '07444 899 712',
   });
   const [customerData, setCustomerData] = useState({
-    customerName: 'John Doe',
-    customerAddress: '456 Customer Street',
-    customerPinCode: '12345',
-    customerContactPerson: 'Jane Doe',
-    customerContactPersonMobNo: '09876 543 210',
+    customerName: '',
+    customerAddress: '',
+    customerPinCode: '',
+    customerContactPerson: '',
+    customerContactPersonMobNo: '',
   });
   const [itemsData, setItemsData] = useState([
     { itemName: 'Water Tanks', quantity: "15", unitPrice: "1200", total: (15 * 1200).toString() },
@@ -356,16 +356,6 @@ const PdfGenerator = () => {
           />
         </div>
         <div>
-          <label htmlFor="companyCity" className="block text-sm font-medium text-gray-700">City, State, ZIP:</label>
-          <input
-            type="text"
-            id="companyCity"
-            value={companyData.companyCity}
-            onChange={(e) => setCompanyData({ ...companyData, companyCity: e.target.value })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          />
-        </div>
-        <div>
           <label htmlFor="companyPhone" className="block text-sm font-medium text-gray-700">Phone Number:</label>
           <input
             type="text"
@@ -422,17 +412,7 @@ const PdfGenerator = () => {
           />
         </div>
         <div>
-          <label htmlFor="customerContactPerson" className="block text-sm font-medium text-gray-700">Contact Person:</label>
-          <input
-            type="text"
-            id="customerContactPerson"
-            value={customerData.customerContactPerson}
-            onChange={(e) => setCustomerData({ ...customerData, customerContactPerson: e.target.value })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          />
-        </div>
-        <div>
-          <label htmlFor="customerContactPersonMobNo" className="block text-sm font-medium text-gray-700">Contact Person Mobile No:</label>
+          <label htmlFor="customerContactPersonMobNo" className="block text-sm font-medium text-gray-700"> Mobile No:</label>
           <input
             type="text"
             id="customerContactPersonMobNo"
