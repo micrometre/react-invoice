@@ -5,10 +5,27 @@ import { applyPlugin } from 'jspdf-autotable';
 applyPlugin(jsPDF);
 
 const PdfGenerator = () => {
+  const generateInvoiceNumber = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    return `INV-${year}${month}${day}-${hours}${minutes}`;
+  };
+
   const [invoiceDetails, setInvoiceDetails] = useState({
-    invoiceNo: 'RFQ20240092',
+    invoiceNo: generateInvoiceNumber(),
     invoiceDate: new Date().toISOString().split('T')[0], // Default to today's date
     dueDate: new Date().toISOString().split('T')[0], // Default to today's date
+  });
+  const [companyData, setCompanyData] = useState({
+    companyName: 'YOUR COMPANY NAME',
+    companyAddress: '123 Business Street',
+    companyCity: 'City, State 12345',
+    companyPhone: '(555) 123-4567',
+    companyEmail: 'info@yourcompany.com',
   });
   const [vendorData, setVendorData] = useState({
     vendorName: 'Foo',
@@ -71,106 +88,87 @@ const PdfGenerator = () => {
     const accentColor = [52, 152, 219];  // Blue
     
     // Header Section with improved layout
-    try {
-      const imageUrl = "/logo.jpg";
-      pdf.addImage(imageUrl, 'JPEG', 15, 15, 35, 20);
-    } catch (error) {
-      // If logo fails to load, add placeholder
-      pdf.setFontSize(16);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(...primaryColor);
-      pdf.text('YOUR COMPANY', 15, 25);
-      pdf.setFontSize(10);
-      pdf.setFont('helvetica', 'normal');
-      pdf.text('LOGO', 15, 30);
-    }
-    
-    // Company details on the right
+    // Large INVOICE title on the left
     pdf.setFontSize(24);
     pdf.setFont('helvetica', 'bold');
     pdf.setTextColor(...primaryColor);
-    pdf.text('INVOICE', 140, 25);
+    pdf.text('INVOICE', 15, 27);
+    
+    // Invoice metadata under INVOICE title
+    pdf.setFontSize(9);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(...primaryColor);
+    pdf.text('Invoice No:', 15, 37);
+    pdf.text('Invoice Date:', 15, 42);
+    pdf.text('Due Date:', 15, 47);
+    
+    pdf.setFont('helvetica', 'normal');
+    pdf.text(invoiceDetails.invoiceNo, 50, 37);
+    pdf.text(format(new Date(invoiceDetails.invoiceDate), 'MMM dd, yyyy'), 50, 42);
+    pdf.text(format(new Date(invoiceDetails.dueDate), 'MMM dd, yyyy'), 50, 47);
+    
+    // Logo on the right, aligned with INVOICE title
+    try {
+      const imageUrl = "/logo.jpg";
+      pdf.addImage(imageUrl, 'JPEG', 140, 15, 35, 20);
+    } catch (error) {
+      // If logo fails to load, add placeholder
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(...secondaryColor);
+      pdf.text('COMPANY', 150, 22);
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text('LOGO', 155, 28);
+    }
+    
+    // Company details under logo
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(...primaryColor);
+    pdf.text(companyData.companyName, 140, 45);
+    pdf.setFontSize(9);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text(companyData.companyAddress, 140, 50);
+    pdf.text(companyData.companyCity, 140, 54);
+    pdf.text(`Phone: ${companyData.companyPhone}`, 140, 58);
+    pdf.text(`Email: ${companyData.companyEmail}`, 140, 62);
     
     // Add decorative line under header
     pdf.setLineWidth(2);
     pdf.setDrawColor(...accentColor);
-    pdf.line(15, 40, 195, 40);
+    pdf.line(15, 90, 195, 90);
     
     pdf.setLineWidth(0.5);
     pdf.setDrawColor(...secondaryColor);
-    pdf.line(15, 42, 195, 42);
-    
-    // Invoice metadata section with improved layout
-    const metadataStartY = 50;
-    pdf.setFontSize(10);
-    pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(...primaryColor);
-    
-    // Create a box for invoice details
-    pdf.setFillColor(248, 249, 250);
-    pdf.rect(140, metadataStartY, 55, 25, 'F');
-    pdf.setDrawColor(...secondaryColor);
-    pdf.rect(140, metadataStartY, 55, 25);
-    
-    pdf.text('Invoice No:', 143, metadataStartY + 6);
-    pdf.text('Invoice Date:', 143, metadataStartY + 12);
-    pdf.text('Due Date:', 143, metadataStartY + 18);
-    
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(invoiceDetails.invoiceNo, 170, metadataStartY + 6);
-    pdf.text(format(new Date(invoiceDetails.invoiceDate), 'MMM dd, yyyy'), 170, metadataStartY + 12);
-    pdf.text(format(new Date(invoiceDetails.dueDate), 'MMM dd, yyyy'), 170, metadataStartY + 18);
+    pdf.line(15, 92, 195, 92);
     
     // Vendor and Customer sections with improved layout
-    const sectionStartY = 85;
+    const sectionStartY = 100;
     
-    // Vendor Section
+    // Customer Section (now takes full width)
     pdf.setFontSize(12);
     pdf.setFont('helvetica', 'bold');
     pdf.setTextColor(...accentColor);
-    pdf.text('VENDOR DETAILS', 15, sectionStartY);
+    pdf.text('CUSTOMER DETAILS', 15, sectionStartY);
     
-    // Vendor box
+    // Customer box (wider since no vendor section)
     pdf.setFillColor(252, 253, 254);
-    pdf.rect(15, sectionStartY + 5, 85, 40, 'F');
+    pdf.rect(15, sectionStartY + 5, 180, 40, 'F');
     pdf.setDrawColor(...secondaryColor);
-    pdf.rect(15, sectionStartY + 5, 85, 40);
+    pdf.rect(15, sectionStartY + 5, 180, 40);
     
     pdf.setFontSize(10);
     pdf.setFont('helvetica', 'bold');
     pdf.setTextColor(...primaryColor);
-    pdf.text(vendorData?.vendorName || 'N/A', 18, sectionStartY + 12);
+    pdf.text(customerData?.customerName || 'N/A', 18, sectionStartY + 12);
     
     pdf.setFont('helvetica', 'normal');
     pdf.setFontSize(9);
-    pdf.text(vendorData?.vendorAddress || 'N/A', 18, sectionStartY + 18);
-    pdf.text(`Post Code: ${vendorData?.vendorPinCode || 'N/A'}`, 18, sectionStartY + 24);
-    pdf.text(`Contact: ${vendorData?.contactPerson || 'N/A'}`, 18, sectionStartY + 30);
-    pdf.text(`Phone: ${vendorData?.contactPersonMobNo || 'N/A'}`, 18, sectionStartY + 36);
-
-    // Customer Section
-    pdf.setFontSize(12);
-    pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(...accentColor);
-    pdf.text('CUSTOMER DETAILS', 110, sectionStartY);
-    
-    // Customer box
-    pdf.setFillColor(252, 253, 254);
-    pdf.rect(110, sectionStartY + 5, 85, 40, 'F');
-    pdf.setDrawColor(...secondaryColor);
-    pdf.rect(110, sectionStartY + 5, 85, 40);
-    
-    pdf.setFontSize(10);
-    pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(...primaryColor);
-    pdf.text(customerData?.customerName || 'N/A', 113, sectionStartY + 12);
-    
-    pdf.setFont('helvetica', 'normal');
-    pdf.setFontSize(9);
-    pdf.text(customerData?.customerAddress || 'N/A', 113, sectionStartY + 18);
-    pdf.text(`Post Code: ${customerData?.customerPinCode || 'N/A'}`, 113, sectionStartY + 24);
-    pdf.text(`Contact: ${customerData?.customerContactPerson || 'N/A'}`, 113, sectionStartY + 30);
-    pdf.text(`Phone: ${customerData?.customerContactPersonMobNo || 'N/A'}`, 113, sectionStartY + 36);
+    pdf.text(customerData?.customerAddress || 'N/A', 18, sectionStartY + 18);
+    pdf.text(`Post Code: ${customerData?.customerPinCode || 'N/A'}`, 18, sectionStartY + 24);
+    pdf.text(`Contact: ${customerData?.customerContactPerson || 'N/A'}`, 18, sectionStartY + 30);
+    pdf.text(`Phone: ${customerData?.customerContactPersonMobNo || 'N/A'}`, 18, sectionStartY + 36);
 
     // Enhanced Items Table
     const itemDetailsRows = itemsData?.map((item, index) => [
@@ -226,11 +224,8 @@ const PdfGenerator = () => {
       didDrawPage: function (data) {
         const finalY = data.cursor.y;
         
-        // Calculate subtotal, tax, and total
-        const subtotal = parseFloat(grandTotal);
-        const taxRate = 0.20; // 20% VAT
-        const taxAmount = subtotal * taxRate;
-        const totalWithTax = subtotal + taxAmount;
+        // Calculate total without tax
+        const total = parseFloat(grandTotal);
         
         // Summary section
         const summaryX = 130;
@@ -238,34 +233,26 @@ const PdfGenerator = () => {
         
         // Summary box
         pdf.setFillColor(248, 249, 250);
-        pdf.rect(summaryX, summaryY - 5, 65, 30, 'F');
+        pdf.rect(summaryX, summaryY - 5, 65, 20, 'F');
         pdf.setDrawColor(...secondaryColor);
-        pdf.rect(summaryX, summaryY - 5, 65, 30);
+        pdf.rect(summaryX, summaryY - 5, 65, 20);
         
         pdf.setFontSize(10);
         pdf.setFont('helvetica', 'normal');
         pdf.setTextColor(...primaryColor);
         
-        // Subtotal
-        pdf.text('Subtotal:', summaryX + 3, summaryY + 3);
-        pdf.text(`£${subtotal.toFixed(2)}`, summaryX + 45, summaryY + 3);
-        
-        // Tax
-        pdf.text('VAT (20%):', summaryX + 3, summaryY + 9);
-        pdf.text(`£${taxAmount.toFixed(2)}`, summaryX + 45, summaryY + 9);
-        
         // Line separator
         pdf.setLineWidth(0.5);
-        pdf.line(summaryX + 3, summaryY + 12, summaryX + 62, summaryY + 12);
+        pdf.line(summaryX + 3, summaryY + 2, summaryX + 62, summaryY + 2);
         
         // Total
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(12);
-        pdf.text('TOTAL:', summaryX + 3, summaryY + 18);
-        pdf.text(`£${totalWithTax.toFixed(2)}`, summaryX + 35, summaryY + 18);
+        pdf.text('TOTAL:', summaryX + 3, summaryY + 10);
+        pdf.text(`£${total.toFixed(2)}`, summaryX + 35, summaryY + 10);
         
         // Payment terms and additional info
-        const termsY = finalY + 55;
+        const termsY = finalY + 45;
         pdf.setFontSize(10);
         pdf.setFont('helvetica', 'bold');
         pdf.setTextColor(...accentColor);
@@ -275,10 +262,7 @@ const PdfGenerator = () => {
         pdf.setFontSize(9);
         pdf.setTextColor(...primaryColor);
         const terms = [
-          '• Payment is due within 30 days of invoice date',
           '• Late payments may incur additional charges',
-          '• Please quote invoice number in all correspondence',
-          '• Bank Details: Sort Code: 12-34-56, Account: 12345678'
         ];
         
         terms.forEach((term, index) => {
@@ -348,59 +332,62 @@ const PdfGenerator = () => {
           />
         </div>
       </div>
-      <h2 className="text-2xl font-bold mb-4">Vendor Details</h2>
+      
+      <h2 className="text-2xl font-bold mb-4">Company Details</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div>
-          <label htmlFor="vendorName" className="block text-sm font-medium text-gray-700">Vendor Name:</label>
+          <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">Company Name:</label>
           <input
             type="text"
-            id="vendorName"
-            value={vendorData.vendorName}
-            onChange={(e) => handleVendorChange('vendorName', e.target.value)}
+            id="companyName"
+            value={companyData.companyName}
+            onChange={(e) => setCompanyData({ ...companyData, companyName: e.target.value })}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
         </div>
         <div>
-          <label htmlFor="vendorAddress" className="block text-sm font-medium text-gray-700">Vendor Address:</label>
+          <label htmlFor="companyAddress" className="block text-sm font-medium text-gray-700">Company Address:</label>
           <input
             type="text"
-            id="vendorAddress"
-            value={vendorData.vendorAddress}
-            onChange={(e) => handleVendorChange('vendorAddress', e.target.value)}
+            id="companyAddress"
+            value={companyData.companyAddress}
+            onChange={(e) => setCompanyData({ ...companyData, companyAddress: e.target.value })}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
         </div>
         <div>
-          <label htmlFor="vendorPinCode" className="block text-sm font-medium text-gray-700">Vendor Post Code:</label>
+          <label htmlFor="companyCity" className="block text-sm font-medium text-gray-700">City, State, ZIP:</label>
           <input
             type="text"
-            id="vendorPinCode"
-            value={vendorData.vendorPinCode}
-            onChange={(e) => handleVendorChange('vendorPinCode', e.target.value)}
+            id="companyCity"
+            value={companyData.companyCity}
+            onChange={(e) => setCompanyData({ ...companyData, companyCity: e.target.value })}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
         </div>
         <div>
-          <label htmlFor="contactPerson" className="block text-sm font-medium text-gray-700">Contact Person:</label>
+          <label htmlFor="companyPhone" className="block text-sm font-medium text-gray-700">Phone Number:</label>
           <input
             type="text"
-            id="contactPerson"
-            value={vendorData.contactPerson}
-            onChange={(e) => handleVendorChange('contactPerson', e.target.value)}
+            id="companyPhone"
+            value={companyData.companyPhone}
+            onChange={(e) => setCompanyData({ ...companyData, companyPhone: e.target.value })}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
         </div>
         <div>
-          <label htmlFor="contactPersonMobNo" className="block text-sm font-medium text-gray-700">Contact Person Mobile No:</label>
+          <label htmlFor="companyEmail" className="block text-sm font-medium text-gray-700">Email Address:</label>
           <input
-            type="text"
-            id="contactPersonMobNo"
-            value={vendorData.contactPersonMobNo}
-            onChange={(e) => handleVendorChange('contactPersonMobNo', e.target.value)}
+            type="email"
+            id="companyEmail"
+            value={companyData.companyEmail}
+            onChange={(e) => setCompanyData({ ...companyData, companyEmail: e.target.value })}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
         </div>
       </div>
+      
+
 
       <h2 className="text-2xl font-bold mb-4">Customer Details</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
