@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import PdfGenerator from './pdfGenerator';
+import React from 'react';
+import InvoiceEntry from './pdfGenerator';
 
 function App() {
   return (
-    <PdfGenerator />
+    <InvoiceEntry />
   );
 }
 

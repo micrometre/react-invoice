@@ -1,8 +1,16 @@
+"use client"; 
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, use } from 'react';
 import { format } from 'date-fns';
 import { jsPDF } from 'jspdf';
 import { applyPlugin } from 'jspdf-autotable';
+
+// Augment the jsPDF module to include autoTable
+declare module 'jspdf' {
+  interface jsPDF {
+    autoTable: (options: any) => jsPDF;
+  }
+}
 
 applyPlugin(jsPDF);
 
@@ -29,8 +37,8 @@ const InvoiceEntry = () => {
     companyPhone: '',
     companyEmail: '',
   });
-  const [logoFile, setLogoFile] = useState(null);
-  const [logoDataUrl, setLogoDataUrl] = useState(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoDataUrl, setLogoDataUrl] = useState<string | null>(null);
   const [vendorData, setVendorData] = useState({
     vendorName: 'Foo',
     vendorAddress: '123 Kings Road',
@@ -58,8 +66,17 @@ const InvoiceEntry = () => {
     setItemsData([...itemsData, { itemName: '', quantity: '', unitPrice: '', total: '' }]);
   };
 
-  const handleItemChange = (index, field, value) => {
-    const newItemsData = [...itemsData];
+  interface Item {
+    itemName: string;
+    quantity: string;
+    unitPrice: string;
+    total: string;
+  }
+
+  type ItemField = keyof Item;
+
+  const handleItemChange = (index: number, field: ItemField, value: string): void => {
+    const newItemsData: Item[] = [...itemsData];
     newItemsData[index][field] = value;
 
     if (field === 'quantity' || field === 'unitPrice') {
@@ -72,17 +89,27 @@ const InvoiceEntry = () => {
     setItemsData(newItemsData);
   };
 
-  const handleRemoveItem = (index) => {
-    const newItemsData = [...itemsData];
+  const handleRemoveItem = (index: number): void => {
+    const newItemsData: Item[] = [...itemsData];
     newItemsData.splice(index, 1);
     setItemsData(newItemsData);
   };
 
-  const handleVendorChange = (field, value) => {
+  interface VendorData {
+    vendorName: string;
+    vendorAddress: string;
+    vendorPinCode: string;
+    contactPerson: string;
+    contactPersonMobNo: string;
+  }
+
+  type VendorField = keyof VendorData;
+
+  const handleVendorChange = (field: VendorField, value: string): void => {
     setVendorData({ ...vendorData, [field]: value });
   };
 
-  const handleLogoUpload = (event) => {
+  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const file = event.target.files?.[0];
     if (file) {
       // Check if file is an image
@@ -102,13 +129,13 @@ const InvoiceEntry = () => {
       // Convert to data URL for preview and PDF
       const reader = new FileReader();
       reader.onload = (e) => {
-        setLogoDataUrl(e.target?.result);
+        setLogoDataUrl(e.target?.result as string);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const removeLogo = () => {
+  const removeLogo = (): void => {
     setLogoFile(null);
     setLogoDataUrl(null);
   };
@@ -128,9 +155,9 @@ const InvoiceEntry = () => {
     pdf.setProperties({ title: "INVOICE" });
 
     // Define colors
-    const primaryColor = [52, 73, 94];   // Dark blue-gray
-    const secondaryColor = [149, 165, 166]; // Light gray
-    const accentColor = [52, 152, 219];  // Blue
+    const primaryColor: [number, number, number] = [52, 73, 94];   // Dark blue-gray
+    const secondaryColor: [number, number, number] = [149, 165, 166]; // Light gray
+    const accentColor: [number, number, number] = [52, 152, 219];  // Blue
     
     // Header Section with improved layout
     // Large INVOICE title on the left
@@ -245,6 +272,62 @@ const InvoiceEntry = () => {
     pdf.setTextColor(...accentColor);
     pdf.text('ITEMS & SERVICES', 15, itemDetailsYStart - 5);
 
+    interface AutoTableColumn {
+      cellWidth: number;
+      halign: 'left' | 'center' | 'right';
+    }
+
+    interface AutoTableHeadStyles {
+      fillColor: [number, number, number];
+      textColor: [number, number, number];
+      fontStyle: 'normal' | 'bold' | 'italic';
+      fontSize: number;
+      halign: 'left' | 'center' | 'right';
+      valign: 'top' | 'middle' | 'bottom';
+    }
+
+    interface AutoTableBodyStyles {
+      fontSize: number;
+      cellPadding: {
+        top: number;
+        right: number;
+        bottom: number;
+        left: number;
+      };
+      textColor: [number, number, number];
+      lineColor: [number, number, number];
+      lineWidth: number;
+    }
+
+    interface AutoTableAlternateRowStyles {
+      fillColor: [number, number, number];
+    }
+
+    interface AutoTableMargin {
+      left: number;
+      right: number;
+    }
+
+    interface AutoTableData {
+      cursor: {
+        y: number;
+      };
+    }
+
+    interface AutoTableOptions {
+      head: string[][];
+      body: string[][];
+      startY: number;
+      headStyles: AutoTableHeadStyles;
+      columnStyles: Record<number, AutoTableColumn>;
+      alternateRowStyles: AutoTableAlternateRowStyles;
+      bodyStyles: AutoTableBodyStyles;
+      tableLineColor: [number, number, number];
+      tableLineWidth: number;
+      margin: AutoTableMargin;
+      didDrawPage: (data: AutoTableData) => void;
+    }
+
     pdf.autoTable({
       head: [itemDetailsHeaders],
       body: itemDetailsRows,
@@ -277,15 +360,15 @@ const InvoiceEntry = () => {
       tableLineColor: secondaryColor,
       tableLineWidth: 0.1,
       margin: { left: 15, right: 15 },
-      didDrawPage: function (data) {
-        const finalY = data.cursor.y;
+      didDrawPage: function (data: AutoTableData): void {
+        const finalY: number = data.cursor.y;
         
         // Calculate total without tax
-        const total = parseFloat(grandTotal);
+        const total: number = parseFloat(grandTotal);
         
         // Summary section
-        const summaryX = 130;
-        let summaryY = finalY + 15;
+        const summaryX: number = 130;
+        let summaryY: number = finalY + 15;
         
         // Summary box
         pdf.setFillColor(248, 249, 250);
@@ -308,7 +391,7 @@ const InvoiceEntry = () => {
         pdf.text(`£${total.toFixed(2)}`, summaryX + 35, summaryY + 10);
         
         // Payment terms and additional info
-        const termsY = finalY + 45;
+        const termsY: number = finalY + 45;
         pdf.setFontSize(10);
         pdf.setFont('helvetica', 'bold');
         pdf.setTextColor(...accentColor);
@@ -317,15 +400,15 @@ const InvoiceEntry = () => {
         pdf.setFont('helvetica', 'normal');
         pdf.setFontSize(9);
         pdf.setTextColor(...primaryColor);
-        const terms = [
+        const terms: string[] = [
           '• Late payments may incur additional charges',
         ];
         
-        terms.forEach((term, index) => {
+        terms.forEach((term: string, index: number): void => {
           pdf.text(term, 15, termsY + 8 + (index * 5));
         });
       },
-    });
+    } as AutoTableOptions);
 
     // Enhanced page numbering and footer
     const totalPages = pdf.internal.pages.length - 1; // Subtract 1 because pages array includes an empty first element
@@ -472,6 +555,8 @@ const InvoiceEntry = () => {
         </div>
       </div>
       
+
+
       <h2 className="text-2xl font-bold mb-4">Customer Details</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div>
@@ -515,6 +600,7 @@ const InvoiceEntry = () => {
           />
         </div>
       </div>
+
 
       <h2 className="text-2xl font-bold mb-4">Item Details</h2>
       <div className="overflow-x-auto">
